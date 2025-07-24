@@ -18,7 +18,17 @@ const ChartContainer = ({ chartType }) => {
         }
         
         const response = await axios.get(url);
-        setData(response.data);
+
+        const formattedData = response.data.map(item => {
+          if (chartType === 'sales') {
+            return { product: item[0], sales: item[1] }; 
+          } else if (chartType === 'users') {
+            return { month: item[0], users: item[1] }; 
+          }
+          return {};
+        });
+
+        setData(formattedData);
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -38,13 +48,13 @@ const ChartContainer = ({ chartType }) => {
         tooltip: {},
         xAxis: {
           type: 'category',
-          data: data.map(item => item.product)
+          data: data.map(item => item.product) 
         },
         yAxis: {
           type: 'value'
         },
         series: [{
-          data: data.map(item => item.sales),
+          data: data.map(item => item.sales), 
           type: 'bar'
         }]
       };
@@ -61,14 +71,14 @@ const ChartContainer = ({ chartType }) => {
         },
         xAxis: {
           type: 'category',
-          data: data.map(item => item.month)
+          data: data.map(item => item.month)  
         },
         yAxis: {
           type: 'value'
         },
         series: [{
           name: '用户数',
-          data: data.map(item => item.users),
+          data: data.map(item => item.users),  
           type: 'line',
           smooth: true
         }]
