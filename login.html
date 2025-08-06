@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<title>登录 / 注册</title>
+<style>
+  body{font-family:Arial,sans-serif;display:flex;height:100vh;align-items:center;justify-content:center;background:#b3a0ac}
+  .box{width:360px;padding:24px 26px;background:#fff;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.12)}
+  h2{text-align:center;margin-bottom:16px}
+  input{width:95%;padding:10px;margin-top:12px;border:1px solid #ccc;border-radius:4px}
+  button{width:100%;padding:10px;margin-top:18px;border:none;border-radius:4px;background:#64a9d9;color:#fff;font-size:15px;cursor:pointer}
+  .switch{text-align:right;margin-top:10px;font-size:14px;cursor:pointer;color:#0645AD}
+</style>
+</head>
+<body>
+
+<div class="box">
+  <h2 id="title">登录</h2>
+
+  <form id="form">
+    <input id="username" placeholder="用户名" required>
+    <input id="password" type="password" placeholder="密码" required>
+    <button id="submitBtn">登 录</button>
+  </form>
+
+  <div class="switch" id="toggle">没有账号？去注册 →</div>
+</div>
+
+<script>
+const API = 'http://localhost:5000';
+let mode = 'login'; 
+
+toggle.onclick = () => {
+  mode = mode === 'login' ? 'register' : 'login';
+  title.textContent   = mode === 'login' ? '登录'   : '注册';
+  submitBtn.textContent = mode === 'login' ? '登 录' : '注 册';
+  toggle.textContent  = mode === 'login' ? '没有账号？去注册 →' : '已有账号？去登录 →';
+};
+
+form.addEventListener('submit', async e => {
+  e.preventDefault();
+  const data = { username: username.value.trim(), password: password.value };
+
+  try{
+    if(mode === 'register'){
+      const r = await fetch(API+'/api/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+      if(!r.ok) throw await r.json();
+    }
+    const r = await fetch(API+'/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    if(!r.ok) throw await r.json();
+    const {access_token} = await r.json();
+    localStorage.setItem('token', access_token);
+    alert(mode === 'login' ? '登录成功！' : '注册并登录成功！');
+    location.href='dashboard.html';
+  }catch(err){
+    alert(err.msg || (mode==='login'?'登录失败':'注册失败'));
+  }
+});
+</script>
+
+</body>
+</html>
+
+
+
